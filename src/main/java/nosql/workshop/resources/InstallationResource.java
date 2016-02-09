@@ -9,6 +9,8 @@ import nosql.workshop.services.InstallationService;
 
 import java.util.List;
 
+import org.jongo.MongoCursor;
+
 /**
  * Resource permettant de gérer l'accès à l'API pour les Installations.
  */
@@ -25,12 +27,12 @@ public class InstallationResource {
     @Get("/")
     @Get("")
     public List<Installation> list(Context context) {
-        return null;
+    	return installationService.getAllInstallations();
     }
 
     @Get("/:numero")
-    public Installation get(String numero) {
-        return null;
+    public Installation get(String numero) {    	
+    	return installationService.getInstallationByNumero(numero);
     }
 
 
@@ -41,6 +43,7 @@ public class InstallationResource {
 
     @Get("/search")
     public List<Installation> search(Context context) {
+    	
         return null;
 
     }
