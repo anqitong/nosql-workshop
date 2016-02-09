@@ -14,7 +14,7 @@ import com.mongodb.MongoClient;
 public class CsvToMongoDb {
     
 	public static void main(String[] args) {
-		/*try{   
+		try{   
 			
 	         MongoClient mongoClient = new MongoClient( "localhost" , 27017 );
 	         DB db = mongoClient.getDB( "sportDB" );
@@ -26,13 +26,13 @@ public class CsvToMongoDb {
 	         //System.out.println("Collection created successfully");
 	      }catch(Exception e){
 	         System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-	      }*/
-        readInstallations();
+	      }
+        readInstallations(db);
     }
     
     //insert into MongoDB(DBobject)
-    public static void readInstallations(){
-    	//DBCollection coll = db.createCollection("mycol");
+    public static void readInstallations(DB db){
+    	DBCollection coll = db.createCollection("mycol");
     	try (InputStream inputStream = CsvToMongoDb.class.getResourceAsStream("/batch/csv/installations.csv");
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                reader.lines()
@@ -46,31 +46,31 @@ public class CsvToMongoDb {
                            String numeroInstall = columns[1].matches("\".*\"")?columns[1].substring(1,columns[1].length()-1):columns[1];
                            String nomCommune = columns[2].matches("\".*\"")?columns[2].substring(1,columns[2].length()-1):columns[2];
                            String codeInsee = columns[3].matches("\".*\"")?columns[3].substring(1,columns[3].length()-1):columns[3];
-                           String codePostal;
-                           String lieuDit;
-                           String numeroVoie;
-                           String nomVoie;
-                           String location;
-                           String longitude;
-                           String latitude;
-                           String accessibilite;
-                           String mobiliteReduite;
-                           String handicapesSensoriels;
-                           String empriseFonciere;
-                           String logementGardien;
-                           String multiCommune;
-                           String placeParking;
-                           String parkingHandicapes;
-                           String installPart;
-                           String metro;
-                           String bus;
-                           String tram;
-                           String train;
-                           String bateau;
-                           String autre;
-                           String nbEquip;
-                           String nbFichesEquip;
-                           String dateMaj;
+                           String codePostal = columns[4].matches("\".*\"")?columns[4].substring(1,columns[4].length()-1):columns[4];
+                           String lieuDit = columns[5].matches("\".*\"")?columns[5].substring(1,columns[5].length()-1):columns[5];
+                           String numeroVoie = columns[6].matches("\".*\"")?columns[6].substring(1,columns[6].length()-1):columns[6];
+                           String nomVoie = columns[7].matches("\".*\"")?columns[7].substring(1,columns[7].length()-1):columns[7];
+                           String location = columns[8].matches("\".*\"")?columns[8].substring(1,columns[8].length()-1):columns[8];
+                           String longitude = columns[9].matches("\".*\"")?columns[9].substring(1,columns[9].length()-1):columns[9];
+                           String latitude = columns[10].matches("\".*\"")?columns[10].substring(1,columns[10].length()-1):columns[10];
+                           String accessibilite = columns[11].matches("\".*\"")?columns[11].substring(1,columns[11].length()-1):columns[11];
+                           String mobiliteReduite = columns[12].matches("\".*\"")?columns[12].substring(1,columns[12].length()-1):columns[12];
+                           String handicapesSensoriels = columns[13].matches("\".*\"")?columns[13].substring(1,columns[13].length()-1):columns[13];
+                           String empriseFonciere = columns[14].matches("\".*\"")?columns[14].substring(1,columns[14].length()-1):columns[14];
+                           String logementGardien = columns[15].matches("\".*\"")?columns[15].substring(1,columns[15].length()-1):columns[15];
+                           String multiCommune = columns[16].matches("\".*\"")?columns[16].substring(1,columns[16].length()-1):columns[16];
+                           String placeParking = columns[17].matches("\".*\"")?columns[17].substring(1,columns[17].length()-1):columns[17];
+                           String parkingHandicapes = columns[18].matches("\".*\"")?columns[18].substring(1,columns[18].length()-1):columns[18];
+                           String installPart = columns[19].matches("\".*\"")?columns[19].substring(1,columns[19].length()-1):columns[19];
+                           String metro = columns[20].matches("\".*\"")?columns[20].substring(1,columns[20].length()-1):columns[20];
+                           String bus = columns[21].matches("\".*\"")?columns[21].substring(1,columns[21].length()-1):columns[21];
+                           String tram = columns[22].matches("\".*\"")?columns[22].substring(1,columns[22].length()-1):columns[22];
+                           String train = columns[23].matches("\".*\"")?columns[23].substring(1,columns[23].length()-1):columns[23];
+                           String bateau = columns[24].matches("\".*\"")?columns[24].substring(1,columns[24].length()-1):columns[24];
+                           String autre = columns[25].matches("\".*\"")?columns[25].substring(1,columns[25].length()-1):columns[25];
+                           String nbEquip = columns[26].matches("\".*\"")?columns[26].substring(1,columns[26].length()-1):columns[26];
+                           String nbFichesEquip = columns[27].matches("\".*\"")?columns[27].substring(1,columns[27].length()-1):columns[27];
+                           String dateMaj = columns[28].matches("\".*\"")?columns[28].substring(1,columns[28].length()-1):columns[28];
                            
                            
                        });
