@@ -69,6 +69,7 @@ public class TownsImporter {
 						    .execute()
 						    .actionGet();
 					System.out.println("Is created : "+response.isCreated());
+					System.out.println("ID : "+response.getId());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
