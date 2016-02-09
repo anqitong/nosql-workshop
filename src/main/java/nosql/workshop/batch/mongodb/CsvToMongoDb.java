@@ -1,9 +1,14 @@
 package nosql.workshop.batch.mongodb;
 
-import java.io.*;
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 
+import org.bson.Document;
+
+import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
@@ -14,10 +19,11 @@ import com.mongodb.MongoClient;
 public class CsvToMongoDb {
     
 	public static void main(String[] args) {
+		DB db = null;
 		try{   
 			
 	         MongoClient mongoClient = new MongoClient( "localhost" , 27017 );
-	         DB db = mongoClient.getDB( "sportDB" );
+	         db = mongoClient.getDB( "sportDB" );
 	         System.out.println("Connect to database successfully");
 	        // boolean auth = db.authenticate(myUserName, myPassword);
 	         //System.out.println("Authentication: "+auth);
@@ -32,18 +38,24 @@ public class CsvToMongoDb {
     
     //insert into MongoDB(DBobject)
     public static void readInstallations(DB db){
-    	DBCollection coll = db.createCollection("mycol");
+    	DBCollection coll = db.getCollection("installations");
     	try (InputStream inputStream = CsvToMongoDb.class.getResourceAsStream("/batch/csv/installations.csv");
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                reader.lines()
                        .skip(1)
                        .filter(line -> line.length() > 0)
-                       .map(line -> line.split(","))
+                       .map(line -> line.split("\",\""))
                        .forEach(columns -> {
                            System.out.println("Une ligne");
-                           System.out.println(columns[0].matches("\".*\"")?columns[0].substring(1,columns[0].length()-1):columns[0]);
-                           String nom = columns[1].matches("\".*\"")?columns[1].substring(1,columns[1].length()-1):columns[1];
-                           String numeroInstall = columns[1].matches("\".*\"")?columns[1].substring(1,columns[1].length()-1):columns[1];
+                           
+                           //String nom = columns[0].matches("\".*\"")?columns[0].substring(2,columns[0].length()-1):columns[0];
+                           
+                           //String nom = columns[0].matches("\".*\"")?columns[0].substring(1,columns[0].length()-1):columns[0];
+                           //System.out.println(nom);
+                           String nom = columns[0].substring(1, columns[0].length());
+                           System.out.println("nom = " + nom);
+                           String numeroInstall = columns[1].matches("\".*\"")?columns[1].substring(1,columns[1].length()-1):columns[1];                           
+                           System.out.println("numeroInstall = " + numeroInstall);
                            String nomCommune = columns[2].matches("\".*\"")?columns[2].substring(1,columns[2].length()-1):columns[2];
                            String codeInsee = columns[3].matches("\".*\"")?columns[3].substring(1,columns[3].length()-1):columns[3];
                            String codePostal = columns[4].matches("\".*\"")?columns[4].substring(1,columns[4].length()-1):columns[4];
@@ -72,6 +84,22 @@ public class CsvToMongoDb {
                            String nbFichesEquip = columns[27].matches("\".*\"")?columns[27].substring(1,columns[27].length()-1):columns[27];
                            String dateMaj = columns[28].matches("\".*\"")?columns[28].substring(1,columns[28].length()-1):columns[28];
                            
+                           coll.insert( new BasicDBObject("_id", numeroInstall).
+                                   append("nom", nom).
+                                   append("address", new Document().
+                                		   append("nomCommune", nomCommune).
+                                		   append("numeroVoie", numeroVoie).
+                                		   append("nomVoie", nomVoie).
+                                		   append("lieuDit", lieuDit).
+                                		   append("codePostal", codePostal)
+                                   ).
+                                   append("location", new Document()
+                                		   .append("latitude", latitude).
+                                		   append("longitude", longitude)
+                                   ).
+                                   append("multiCommune", multiCommune).
+                                   append("placeParking", placeParking).
+                                   append("parkingHandicapes", parkingHandicapes));                     
                            
                        });
            } catch (IOException e) {
