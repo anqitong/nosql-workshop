@@ -155,10 +155,9 @@ public class CsvToMongoDb {
 		catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-
-
-
 	}
+	
+	
 	//update mongo
 	public static void readAct(MongoDatabase db){
 		
