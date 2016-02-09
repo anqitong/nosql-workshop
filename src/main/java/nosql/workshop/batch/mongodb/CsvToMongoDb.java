@@ -141,7 +141,7 @@ public class CsvToMongoDb {
 				//Document update = new Document("$push", new Document("ins"));
 						
 				
-				db.getCollection("installations").updateOne(query, update);
+				//db.getCollection("installations").updateOne(query, update);
 				//update(query, update);
 			});
 		}
