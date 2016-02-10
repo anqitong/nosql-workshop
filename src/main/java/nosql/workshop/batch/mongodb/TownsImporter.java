@@ -65,19 +65,19 @@ public class TownsImporter {
 				double x = Double.parseDouble(columns[6].trim());
 				double y = Double.parseDouble(columns[7].trim());
 				
-				XContentBuilder builder;
+				//XContentBuilder builder;
 				try {
-					builder = jsonBuilder()
-							 .startObject()
-						        .field("objectID", objectID)
-						        .field("townName", townName)
-						        .field("townNameSuggest", townNameSuggest)
-						        .field("postcode", postcode)
-						        .field("pays", pays)
-						        .field("region", region)
-						        .field("x", x)
-						        .field("y", y)
-						    .endObject();
+//					builder = jsonBuilder()
+//							 .startObject()
+//						        .field("objectID", objectID)
+//						        .field("townName", townName)
+//						        .field("townNameSuggest", townNameSuggest)
+//						        .field("postcode", postcode)
+//						        .field("pays", pays)
+//						        .field("region", region)
+//						        .field("x", x)
+//						        .field("y", y)
+//						    .endObject();
 					
 					/*IndexResponse response = client.prepareIndex("towns","town", objectID)
 						    .setSource(builder)

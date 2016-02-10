@@ -43,9 +43,7 @@ public class InstallationResource {
 
     @Get("/search")
     public List<Installation> search(Context context) {
-    	
-        return null;
-
+    	return installationService.search();
     }
 
     @Get("/geosearch")
@@ -56,7 +54,7 @@ public class InstallationResource {
 
     @Get("/stats")
     public InstallationsStats stats() {
-        return null;
+        return installationService.getInstallationsStat();
 
     }
 }
