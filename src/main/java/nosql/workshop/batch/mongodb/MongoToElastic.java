@@ -16,16 +16,13 @@ import nosql.workshop.model.Town;
 import nosql.workshop.services.InstallationService;
 import nosql.workshop.services.MongoDB;
 
-public class MongoToElastic {
-	
-	
+public class MongoToElastic {	
 	
 	public static void main(String[] args) {
 		MongoDB mongoDB = new MongoDB();
 		try {
 			InstallationService installationService = new InstallationService(mongoDB);
 			List<Installation> installations = installationService.getAllInstallations();
-
 			
 			//System.out.println(installations.get(0));
 			//System.out.println("id = " + installations.get(0).get_id());
@@ -48,7 +45,8 @@ public class MongoToElastic {
 	
 	public static void readAndWrite(List<Installation> list, JestClient client){
 		
-		for(Installation ins:list){			
+		for(Installation ins:list){
+			System.out.println("equipement = " + ins.getEquipements().get(0).getNom());
 			Index index = new Index.Builder(ins).index("installations").type("installation").id(ins.get_id()).build();
 			try {
 				DocumentResult documentResult = client.execute(index);
