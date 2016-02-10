@@ -18,7 +18,11 @@ public class MongoToElastic {
 		try {
 			InstallationService installationService = new InstallationService(mongoDB);
 			List<Installation> installations = installationService.getAllInstallations();
+			
 			System.out.println(installations.get(0));
+			System.out.println("id = " + installations.get(0).get_id());
+			System.out.println("installation name = " + installations.get(0).getNom());
+			//System.out.println("equip = " + installations.get(0).getEquipements().get(0).);
 			
 			
 		} catch (UnknownHostException e) {
