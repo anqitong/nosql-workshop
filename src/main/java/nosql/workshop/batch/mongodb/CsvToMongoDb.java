@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
+import java.util.Arrays;
+
 import org.bson.Document;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -90,22 +92,29 @@ public class CsvToMongoDb {
 				String nbFichesEquip = columns[27].matches("\".*\"")?columns[27].substring(1,columns[27].length()-1):columns[27];
 				String dateMaj = columns[28].matches("\".*\"")?columns[28].substring(1,columns[28].length()-1):columns[28];
 
-				Document doc = new Document("_id", numeroInstall).
-						append("nom", nom).
-						append("address", new Document().
-								append("nomCommune", nomCommune).
-								append("numeroVoie", numeroVoie).
-								append("nomVoie", nomVoie).
-								append("lieuDit", lieuDit).
-								append("codePostal", codePostal)
-								).
-						append("location", new Document()
-								.append("latitude", latitude).
-								append("longitude", longitude)
-								).
-						append("multiCommune", multiCommune.equals("Oui") ? true : false).
-						append("placeParking", placeParking).
-						append("parkingHandicapes", parkingHandicapes);
+				//Double [] coords = new Double [2];
+				//coords[0] = Double.valueOf(latitude);
+				//coords[1] = Double.valueOf(longitude);
+				
+				
+				
+				//System.out.println(coords[0]);
+				
+						Document doc = new Document("_id", numeroInstall)
+								.append("nom", nom)
+								.append("adresse",
+										new Document().append("commune", nomCommune).append("numero", numeroVoie)
+												.append("voie", nomVoie).append("lieuDit", lieuDit)
+												.append("codePostal", codePostal))
+								.append("location",
+	                        			new Document("type","Point")
+	                        			.append("coordinates", Arrays.asList(Double.valueOf(columns[9]),Double.valueOf(columns[10])))
+	                        			)
+								.append("multiCommune", multiCommune.equals("Oui") ? true : false)
+								.append("nbPlacesParking", placeParking)
+								.append("nbPlacesParkingHandicapes", parkingHandicapes)
+								;
+						//System.out.println(doc.toJson());
 				//doc.put("equipements", new ArrayList<Document>());				
 				coll.insertOne(doc);	
 				
@@ -178,16 +187,7 @@ public class CsvToMongoDb {
                            
                            System.out.println("activiteCode = " + activiteCode);
                            System.out.println("activityNom = " + nomActivite);
-                           System.out.println("numeroFicheEqui = " + numeroEquipment);
-                           
-                           Document activity = new Document().
-                        		   append("activiteCode", activiteCode).
-                        		   append("nomActivite", nomActivite).
-                        		   append("nomCommune", nomCommune).
-                        		   append("numeroFicheEqui", numeroEquipment).
-                        		   append("nbEquiIdent", nbEquiIdent).
-                        		   append("codeInsee", codeInsee);                       		   
-		
+                           //System.out.println("numeroFicheEqui = " + numeroEquipment);                          
 		
                            	Document search = new Document("equipements", 
                            			new Document("$elemMatch",  new Document("numero", numeroEquipment)));
