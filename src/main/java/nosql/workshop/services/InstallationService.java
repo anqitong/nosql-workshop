@@ -102,7 +102,9 @@ public class InstallationService {
         JestClient client = factory.getObject();
        
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.query(QueryBuilders.queryString(lat));
+        searchSourceBuilder.query(QueryBuilders.queryString(lat))
+        .query(QueryBuilders.queryString(lng))
+        .query(QueryBuilders.queryString(distance));
         Search search = (Search) new Search.Builder(searchSourceBuilder.toString())
                                         .addIndex("installations")
                                         //.addType("menu")
