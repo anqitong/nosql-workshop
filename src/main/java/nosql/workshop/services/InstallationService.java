@@ -28,6 +28,22 @@ import nosql.workshop.model.Town;
 import nosql.workshop.model.stats.CountByActivity;
 import nosql.workshop.model.stats.InstallationsStats;
 
+import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import nosql.workshop.model.Equipement;
+import nosql.workshop.model.Installation;
+import nosql.workshop.model.stats.Average;
+import nosql.workshop.model.stats.CountByActivity;
+import nosql.workshop.model.stats.InstallationsStats;
+import org.jongo.MongoCollection;
+
+import net.codestory.http.Context;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Service permettant de manipuler les installations sportives.
  */
@@ -46,15 +62,7 @@ public class InstallationService {
 	}
 
 	public Installation random() {
-		// FIXME : bien sûr ce code n'est pas le bon ... peut être quelque chose comme installations.findOne()
-		Installation installation = new Installation();
-		installation.setNom("Mon Installation");
-		installation.setEquipements(Arrays.asList(new Equipement()));
-		installation.setAdresse(new Adresse());
-		Location location = new Location();
-		location.setCoordinates(new double[]{3.4, 3.2});
-		installation.setLocation(location);
-		return installation;
+		return installations.aggregate("{ $sample: { size: 1 } }").as(Installation.class).next();
 	}
 
 	public Installation getInstallationByNumero(String numero) {       	
@@ -121,67 +129,73 @@ public class InstallationService {
 
 	}
 
+
+	public List<Installation> geoSearch(String lat, String lng, String distance) {
+		installations.ensureIndex("{ location : '2dsphere' } ");
+		return Lists.newArrayList(installations.find("{'location' : { $near : { $geometry : { type : 'Point', coordinates: ["+lng+", "+lat+"]}, $maxDistance : "+distance+"}}}")
+				.as(Installation.class).iterator());
+	}
+
+
+	public List<Installation> getList() {
+		return Lists.newArrayList(installations.find().as(Installation.class).iterator());
+	}	
+
 	public InstallationsStats getInstallationsStat() {
-		/*InstallationsStats stats = new InstallationsStats();
-    	//set total    	
-    	stats.setTotalCount(installations.count());
-    	//set total by activity
-    	List<CountByActivity> list = (List<CountByActivity>) installations.aggregate(""
-    			+ "["
-    			+ "{ $unwind: {$equipements.activites} },"
-    			+ " {$group: {_id : $equipements.activites, "
-    			+ "total : { $sum : 1 } } }"
-    			+ " ]").as(CountByActivity.class);
-    	//System.out.println("count by activity = " + list.get(0).getTotalCount());
-
-    	return stats;*/
-
-		long total = installations.count();//nb d'installations
-		List<Installation> liste = new ArrayList();
-		for (int i=0; i<installations.count();i++){
-			liste.add(installations.find().skip(i).as(Installation.class).next());
-		}
-		List<String> listeActivite= new ArrayList();
-		int k=0;
-		int equipementtotal=0;
-		for (int i=0;i<liste.size();i++){
-			if(liste.get(i).getEquipements()!=null){
-				for(int j=0;j<liste.get(i).getEquipements().size();j++){
-					equipementtotal=equipementtotal+liste.get(i).getEquipements().size();
-					if(liste.get(i).getEquipements().size()>k){
-						k=i;}
-					if(liste.get(i).getEquipements().get(j).getActivites()!=null){
-						for(int h=0;h<liste.get(i).getEquipements().get(j).getActivites().size();h++){
-							listeActivite.add(liste.get(i).getEquipements().get(j).getActivites().get(h));
-						}
-					}
-
-				}}
-		}
-		List<CountByActivity> listCount = new ArrayList();
-		CountByActivity count;
-		while(listeActivite.size()>0){
-			int j=1;
-			for(int i=1;i<listeActivite.size();i++){
-
-				if(listeActivite.get(i).matches(listeActivite.get(0))){
-					j++;
-					listeActivite.remove(i);
-				}
-
-			}
-			count = new CountByActivity();
-			count.setActivite(listeActivite.get(0));
-			count.setTotal(j);
-			listeActivite.remove(0);
-			listCount.add(count);
-		}
-		double average = (double) equipementtotal/total;
 		InstallationsStats stats = new InstallationsStats();
-		stats.setAverageEquipmentsPerInstallation(average);
-		stats.setCountByActivity(listCount);
-		stats.setInstallationWithMaxEquipments(liste.get(k));
+
+		long total = installations.count();
+
 		stats.setTotalCount(total);
+
+		Installation installation = installations.aggregate("{"
+				+ "$project: {equip: {$size: '$equipements'}}}")
+				.and("{$sort: {equip: -1}"
+						+ "}")
+				.and("{$limit: 1}")
+				.as(Installation.class).next();
+		Installation maxInstall = installations.findOne("{_id: #}",
+				installation.get_id())
+				.as(Installation.class);
+
+		stats.setInstallationWithMaxEquipments(maxInstall);
+
+		double moy = installations.aggregate("{"
+				+ "$unwind: '$equipements'"
+				+ "}")
+				.and("{"
+						+ "$group: {_id : '$_id', total: {$sum : 1}}"
+						+ "}")
+				.and("{"
+						+ "$group: {_id : 0, average: {$avg : '$total'}}"
+						+ "}")
+				.and("{"
+						+ "$project: {_id : 0, average: 1}"
+						+ "}")
+				.as(Average.class).next().getAverage();
+
+		stats.setAverageEquipmentsPerInstallation(moy);
+
+		ArrayList<CountByActivity> listCount = Lists.newArrayList(installations.aggregate("{"
+				+ "$unwind:'$equipements'"
+				+ "}")
+				.and("{"
+						+ "$unwind: '$equipements.activites'"
+						+ "}")
+				.and("{"
+						+ "$group: {_id: '$equipements.activites', total:{$sum : 1}}"
+						+ "}")
+				.and("{"
+						+ "$project: {activite: '$_id', total : 1}"
+						+ "}")
+				.and("{"
+						+ "$sort: {total: -1}"
+						+ "}")
+				.as(CountByActivity.class).iterator());
+
+		stats.setCountByActivity(listCount);
+
 		return stats;
 	}
+
 }
