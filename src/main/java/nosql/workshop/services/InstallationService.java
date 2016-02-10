@@ -74,7 +74,7 @@ public class InstallationService {
     	return installationsList;
     }
     
-    public List<Installation> search() throws IOException {
+    public List<Installation> search(String query) throws IOException {
     	JestClientFactory factory = new JestClientFactory();
         factory.setHttpClientConfig(new HttpClientConfig.Builder("http://localhost:9200")
                 .multiThreaded(true)
@@ -82,14 +82,37 @@ public class InstallationService {
         JestClient client = factory.getObject();
        
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.query(QueryBuilders.queryString("search?query=Port+Carquefou"));
+        searchSourceBuilder.query(QueryBuilders.queryString(query));
         Search search = (Search) new Search.Builder(searchSourceBuilder.toString())
                                         .addIndex("installations")
                                         //.addType("menu")
                                         .build();
         //System.out.println("hai");
 			JestResult result = client.execute(search);
-    	return (List<Installation>) result ;
+			
+			List<Installation> res = result.getSourceAsObjectList(Installation.class);
+    	return res ;
+    }
+    
+    public List<Installation> geosearch(String lat, String lng, String distance) throws IOException{
+    	JestClientFactory factory = new JestClientFactory();
+        factory.setHttpClientConfig(new HttpClientConfig.Builder("http://localhost:9200")
+                .multiThreaded(true)
+                .build());
+        JestClient client = factory.getObject();
+       
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.queryString(lat));
+        Search search = (Search) new Search.Builder(searchSourceBuilder.toString())
+                                        .addIndex("installations")
+                                        //.addType("menu")
+                                        .build();
+        //System.out.println("hai");
+			JestResult result = client.execute(search);
+			
+			List<Installation> res = result.getSourceAsObjectList(Installation.class);
+    	return res ;
+    	
     }
     
     public InstallationsStats getInstallationsStat() {

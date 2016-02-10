@@ -48,13 +48,16 @@ public class InstallationResource {
 
     @Get("/search")
     public List<Installation> search(Context context) throws IOException {
-    	return installationService.search();
+    	String query = context.query().get("query");
+    	return installationService.search(query);
     }
 
     @Get("/geosearch")
-    public List<Installation> geosearch(Context context) {
-        return null;
-
+    public List<Installation> geosearch(Context context) throws IOException {
+    	String lat = context.query().get("lat");
+    	String lng = context.query().get("lng");
+    	String distance = context.query().get("distance");
+    	return installationService.geosearch(lat, lng, distance);
     }
 
     @Get("/stats")
