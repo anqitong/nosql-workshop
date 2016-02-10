@@ -103,7 +103,7 @@ public class CsvToMongoDb {
 								.append("latitude", latitude).
 								append("longitude", longitude)
 								).
-						append("multiCommune", multiCommune).
+						append("multiCommune", multiCommune.equals("Oui") ? true : false).
 						append("placeParking", placeParking).
 						append("parkingHandicapes", parkingHandicapes);
 				//doc.put("equipements", new ArrayList<Document>());				
