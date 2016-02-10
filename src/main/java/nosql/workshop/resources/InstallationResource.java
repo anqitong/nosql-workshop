@@ -1,12 +1,17 @@
 package nosql.workshop.resources;
 
 import com.google.inject.Inject;
+
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestClientFactory;
+import io.searchbox.client.config.HttpClientConfig;
 import net.codestory.http.Context;
 import net.codestory.http.annotations.Get;
 import nosql.workshop.model.Installation;
 import nosql.workshop.model.stats.InstallationsStats;
 import nosql.workshop.services.InstallationService;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.jongo.MongoCursor;
@@ -42,7 +47,7 @@ public class InstallationResource {
     }
 
     @Get("/search")
-    public List<Installation> search(Context context) {
+    public List<Installation> search(Context context) throws IOException {
     	return installationService.search();
     }
 
